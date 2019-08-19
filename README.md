@@ -107,7 +107,13 @@ pytest
 ## Docker
 
 We prepared a Docker container descriptor that provides all requirements properly installed.
-The first step is the build the container. This may take a while.
+You can install it as follows:
+
+```sh
+docker pull meuparlamento/meuparlamento-pipeline
+```
+
+In case you prefer to build it locally. This may take a while.
 
 ```sh
 docker build -t meuparlamento-pipeline .
