@@ -1,0 +1,56 @@
+[
+    {
+        "votos" : {
+            "contra" : [
+                "PS",
+                "BE",
+                "PCP",
+                "PEV"
+            ],
+            "afavor" : [
+                "CDS-PP"
+            ],
+            "abstencao" : [
+                "PSD"
+            ],
+            "ausencia": [
+                "PAN"
+            ]
+        }
+    },
+    {
+        "votos" : {
+            "contra" : [
+                "93-PSD",
+                "António Braga (PS)",
+                "CDS-PP",
+                "João Portugal (PS)",
+                "António Cardoso (PS)"
+            ],
+            "afavor" : [
+                "Cristóvão Norte (PSD)",
+                "62-PS",
+                "PCP",
+                "BE",
+                "PEV",
+                "Francisca Almeida (PSD)",
+                "Joana Barata Lopes (PSD)",
+                "Sérgio Azevedo (PSD)",
+                "Teresa Leal Coelho (PSD)",
+                "Cristóvão Simão Ribeiro (PSD)",
+                "Gabriel Côrte-Real Goucha (PSD)"
+            ],
+            "abstencao" : [
+                "João Prata (PSD)",
+                "Isabel Oneto (PS)",
+                "Maria Paula Cardoso (PSD)",
+                "Pedro Saraiva (PSD)",
+                "Odete Silva (PSD)",
+                "Maria José Castelo Branco (PSD)",
+                "Miguel Laranjeiro (PS)",
+                "Renato Sampaio (PS)",
+                "José Junqueiro (PS)"
+            ]
+        }
+    }
+]
