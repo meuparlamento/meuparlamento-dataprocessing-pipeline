@@ -141,8 +141,8 @@ class SimplifyDocumentSchema(BaseLuigiTask):
                     doc = json.loads(line) 
                     
                     # check if it was voted
-                    if("resultadoFinal" not in doc.keys()):
-                        continue
+                    # if("resultadoFinal" not in doc.keys()):
+                    #     continue
 
                     categorias_comissoes = [translate_comission_category(comissao) for comissao in doc["comissoes"]]
 
@@ -157,7 +157,7 @@ class SimplifyDocumentSchema(BaseLuigiTask):
                         "votos":doc["votos"],
                         "anoVotacao":doc["anoVotacao"],
                         "proposedBy":doc["proposedBy"],
-                        "resultadoFinal":doc["resultadoFinal"],
+                        # "resultadoFinal":doc["resultadoFinal"],
                         "url":doc["url"],
                         "source_domain":doc["source_domain"],
                     } 
