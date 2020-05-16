@@ -1,6 +1,18 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
 
+if (length(args)<2) {
+  stop("Please inform input and output file 
+        
+        RScript [program.R] [input_file] [output_file]", call.=FALSE)
+} 
+
+PARTY_MIN_TRESHOLD=1
+
+## program...
+input_file = args[1]
+# output_file = args[2]
+
 # test if there is at least one argument: if not, return an error
 if (length(args)<2) {
   stop("Please inform input and output file 
@@ -15,8 +27,8 @@ input_file = args[1]
 output_file = args[2]
 
 # Load data
-voteboard_df <- read.csv("results/probabilities/aggregated_voting_data_38500_3500.csv", header = TRUE, stringsAsFactors=FALSE)
-# voteboard_df <- read.csv(input_file, header = TRUE, stringsAsFactors=F)
+# voteboard_df <- read.csv("results/probabilities/aggregated_voting_data_38500_3500.csv", header = TRUE, stringsAsFactors=FALSE)
+voteboard_df <- read.csv(input_file, header = TRUE, stringsAsFactors=F)
 
 # Create an auxiliary attribute for encapsulating entries in proposedBy that have small numbers
 voteboard_df["proposedBy_aux"] <- voteboard_df$proposedBy

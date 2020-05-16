@@ -21,10 +21,17 @@ from meuparlamento.pdf import PDFReader
 from meuparlamento.nlp import ContentSummarizer
 from meuparlamento.utils import translate_comission_category
 
+import os 
+os.system("./set_env.sh")
+
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
 MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "meuParlamento")
 WORKING_DIR = os.environ.get("WORKING_DIR", "./")
 
+print("MONGO_URI", MONGO_URI)
+print("MONGO_DB_NAME", MONGO_DB_NAME)
+
+# MONGO_URI = "mongodb+srv://datapipeline-user-writer:bhYctIekkXqqBYpO4Z7TLAgX0sMa4Lce@cluster0-djknq.gcp.mongodb.net/test?retryWrites=true&w=majority"
 class HarvestConfig(luigi.Config):
     proposal_url_template = luigi.Parameter()
     webarchive_url_replay = luigi.Parameter()
@@ -157,10 +164,12 @@ class SimplifyDocumentSchema(BaseLuigiTask):
                         "votos":doc["votos"],
                         "anoVotacao":doc["anoVotacao"],
                         "proposedBy":doc["proposedBy"],
-                        # "resultadoFinal":doc["resultadoFinal"],
                         "url":doc["url"],
                         "source_domain":doc["source_domain"],
                     } 
+
+                    if("resultadoFinal" in doc.keys()):
+                        simple_proposal_doc["resultadoFinal"] = doc["resultadoFinal"]
 
                     simple_proposal_doc["dataVotacao"] = doc["dataVotacao"]["$date"]
                     simple_proposal_doc["metadata"] = {
@@ -187,6 +196,8 @@ class ProposalDatabasePersistence(BaseLuigiTask):
         self.mongo_conn=pymongo.MongoClient(MONGO_URI)
         self.mongo_conn_database = self.mongo_conn[MONGO_DB_NAME]
         
+        print("MONGO_URI", MONGO_URI)
+        print("MONGO_DB_NAME", MONGO_DB_NAME)
         #require json file with metadata
         return [
             SimplifyDocumentSchema(proposal_id=self.proposal_id)
@@ -196,8 +207,11 @@ class ProposalDatabasePersistence(BaseLuigiTask):
         return []
 
     def run(self):
+        print("run insert")
         with self.input()[0][0].open() as fin:
+            
             for line in fin:
+                print("run insert", line)
                 doc = json.loads(line)               
                 doc["last_update"] = doc["last_update"]["$date"]
                 self.mongo_conn_database["proposals"].update({'BID':doc["BID"]},{'$set':doc},upsert = True)
@@ -329,7 +343,80 @@ class ComputeProbabilities(BaseLuigiTask):
 
         with self.output().open('w') as fout:
             fout.write(tmp_result)
+
+import os     
+class AggregateAllVotingDataLocal(BaseLuigiTask):
+    input_dir = luigi.Parameter(default="results/final_schema")
+
+    def output(self):
+        output_file = "results/probabilities/aggregated_voting_data.csv"
+        output_filepath = os.path.join(WORKING_DIR, output_file)
+
+        return self.handleOutputDestination(output_filepath, output_format=UTF8)
+
+    def decode_vote(self, party, row):
+        if party in row["votos"]["afavor"]:
+            return 1
+        elif party in row["votos"]["contra"]:
+            return -1
+        elif party in row["votos"]["abstencao"]:
+            return 0
+        else:
+            return None
+
+    def run(self):
+        input_files = os.listdir(self.input_dir)
+        
+        with self.output()[0].open('w') as fout:
             
+            data = []
+            for y in input_files:
+                
+                # try:
+                if(True):
+                    filename = self.input_dir + "/" + y
+                    print(filename)
+                    # res = open(filename, "r")
+                    # fin = res[0].open('r')
+                    fin = open(filename, "r")
+
+                    for line in fin:
+                        doc = json.loads(line) 
+
+                        simple_vote_data = {
+                            "BID":doc["BID"],
+                            "proposedBy":doc["proposedBy"],
+                            "is_governo":doc["metadata"]["is_governo"],
+
+                            "readability_score":doc["metadata"]["readability_score"],
+                            "num_chars":doc["metadata"]["num_chars"]
+                        }
+                        
+                        # "metadata.is_governo":True, 
+                        # "metadata.readability_score": 0, 
+                        # "metadata.num_chars":{"$lte":150}
+                        
+                        simple_vote_data["PSD"] = self.decode_vote("PSD", doc)
+                        simple_vote_data["PS"] = self.decode_vote("PS", doc)
+                        simple_vote_data["CDS_PP"] = self.decode_vote("CDS_PP".replace("_","-"), doc)
+                        simple_vote_data["PCP"] = self.decode_vote("PCP", doc)
+                        simple_vote_data["BE"] = self.decode_vote("BE", doc)
+                        simple_vote_data["PEV"] = self.decode_vote("PEV", doc)
+                        simple_vote_data["PAN"] = self.decode_vote("PAN", doc)
+
+                        data.append(simple_vote_data)
+                        
+                    fin.close()
+                # except Exception as e:
+                #     print("ignore error",e)
+                #     pass
+
+
+            data_df = pd.DataFrame(data)
+            data_df.to_csv(fout)
+
+
+
 class AggregateAllVotingData(BaseLuigiTask):
     offset = luigi.IntParameter(default=0)
     limit = luigi.IntParameter(default=10)

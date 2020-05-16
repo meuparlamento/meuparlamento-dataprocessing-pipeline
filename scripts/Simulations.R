@@ -1,4 +1,21 @@
-voteboard <- read.csv("./results/probabilities/probabilities_38500_3500.csv", header = TRUE, stringsAsFactors=F)
+# #!/usr/bin/env Rscript
+# args = commandArgs(trailingOnly=TRUE)
+
+# if (length(args)<1) {
+#   stop("Please inform input and output file 
+        
+#         RScript [program.R] [input_file] [output_file]", call.=FALSE)
+# } 
+
+# PARTY_MIN_TRESHOLD=1
+
+# ## program...
+# input_file = args[1]
+# # output_file = args[2]
+
+# voteboard <- read.csv("./results/probabilities/probabilities_38500_3500.csv", header = TRUE, stringsAsFactors=F)
+voteboard <- read.csv(input_file, header = TRUE, stringsAsFactors=F)
+
 
 voteboard["emPoder"] <- ifelse(voteboard$is_governo == "True" | voteboard$proposedBy == "Governo", TRUE, FALSE)
 
