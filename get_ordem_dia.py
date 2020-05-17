@@ -60,9 +60,12 @@ if ag_day:
 
 
 # Request proposals details using Luigi task
+import os 
+os.system("./set_env.sh")
 from run_luigi import SimplifyDocumentSchema
 from luigi import scheduler, worker
 
+sch = scheduler.Scheduler()
 w = worker.Worker(scheduler=sch)
 
 for proposta in propostas:
