@@ -31,7 +31,6 @@ WORKING_DIR = os.environ.get("WORKING_DIR", "./")
 print("MONGO_URI", MONGO_URI)
 print("MONGO_DB_NAME", MONGO_DB_NAME)
 
-# MONGO_URI = "mongodb+srv://datapipeline-user-writer:bhYctIekkXqqBYpO4Z7TLAgX0sMa4Lce@cluster0-djknq.gcp.mongodb.net/test?retryWrites=true&w=majority"
 class HarvestConfig(luigi.Config):
     proposal_url_template = luigi.Parameter()
     webarchive_url_replay = luigi.Parameter()
