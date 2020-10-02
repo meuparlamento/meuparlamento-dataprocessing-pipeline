@@ -21,8 +21,12 @@ from meuparlamento.pdf import PDFReader
 from meuparlamento.nlp import ContentSummarizer
 from meuparlamento.utils import translate_comission_category
 
+from meuparlamento.pdf_content_processing import extract_pdf_main_content
+
 import os 
 os.system("./set_env.sh")
+
+print(os.environ)
 
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
 MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "meuParlamento")
@@ -33,6 +37,7 @@ print("MONGO_DB_NAME", MONGO_DB_NAME)
 
 class HarvestConfig(luigi.Config):
     proposal_url_template = luigi.Parameter()
+    diploma_url_template = luigi.Parameter()
     webarchive_url_replay = luigi.Parameter()
     rscript_pdf_parser = luigi.Parameter()
     rscript_sampling_probabilities = luigi.Parameter()
@@ -84,7 +89,9 @@ class PDFTextParser(BaseLuigiTask):
         with self.input()[0][0].open("rb") as fin:
             with self.output()[0].open('w') as fout:
             
-                content = PDFReader.pdf2text(fin)
+                # content = PDFReader.pdf2text(fin)
+                content = extract_pdf_main_content(fin.path)
+
                 fout.write(content)
 
 class PDFTextParserRScript(BaseLuigiTask):
@@ -104,7 +111,8 @@ class PDFTextParserRScript(BaseLuigiTask):
             with self.output()[0].open('w') as fout:
                 
                 print("self.input()[0][0].path",self.input()[0][0].path)
-                content = PDFReader.pdf2summary(HarvestConfig().rscript_pdf_parser, self.input()[0][0].path)
+                # content = PDFReader.pdf2summary(HarvestConfig().rscript_pdf_parser, self.input()[0][0].path)
+                content = extract_pdf_main_content(self.input()[0][0].path)
                 if(content):
                     fout.write(content)
 
@@ -213,7 +221,11 @@ class ProposalDatabasePersistence(BaseLuigiTask):
                 print("run insert", line)
                 doc = json.loads(line)               
                 doc["last_update"] = doc["last_update"]["$date"]
-                self.mongo_conn_database["proposals"].update({'BID':doc["BID"]},{'$set':doc},upsert = True)
+                # self.mongo_conn_database["proposals"].update({'BID':doc["BID"]},{'$set':doc},upsert = True)
+                if("resultadoFinal" in doc.keys()):
+                    self.mongo_conn_database["proposals"].update({'BID':doc["BID"]},{'$set':doc},upsert = True)
+                else:
+                    self.mongo_conn_database["agenda"].update({'BID':doc["BID"]},{'$set':doc},upsert = True)
 
 class ProposalContentAnalysis(BaseLuigiTask):
     proposal_id = luigi.IntParameter()

@@ -13,3 +13,4 @@ requests
 sumy==0.8.1
 luigi==2.8.6
 awscli==1.16.216
+dnspython

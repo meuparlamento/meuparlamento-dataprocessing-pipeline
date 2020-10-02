@@ -2,9 +2,12 @@ from lxml import html
 import requests
 import lxml
 from lxml import etree
-
+import os
 import re
 
+os.system("./set_env.sh")
+
+print(os.environ)
 # Last entries
 url = "https://www.parlamento.pt/Paginas/UltimasIniciativasEntradas.aspx"
 

@@ -42,13 +42,24 @@ class PortugueseParlamentProposalsHarvester(object):
                 
     def fetch_proposal(self, bid):
         proposal_url = self.config.proposal_url_template + str(bid)
+        
 
         logger.info(proposal_url)
         
         response = requests.get(proposal_url)
         if(response.status_code == 200):
-            return self._handle_fetch_proposal_response(response)
-
+            if("Erro a aceder aos dados!" not in response.text):
+                return self._handle_fetch_proposal_response(response)
+            else:
+                # Ignorar diplomas nesse momento
+                return None
+            # TODO provavelmente é um diploma
+            # else:
+            #     diploma_url = self.config.diploma_url_template + str(bid)
+            #     logger.info("diploma_url :" + diploma_url)
+            #     response = requests.get(diploma_url)
+            #     if(response.status_code == 200):
+            #         return self._handle_fetch_proposal_response(response)
         else:
             logger.info("Failed request. Try web archive")
             logger.info(proposal_url)
@@ -154,6 +165,9 @@ class PortugueseParlamentProposalsHarvester(object):
     def _parse_html(self, html_content):
         tree = html.fromstring(html_content)
         
+
+        # //div[contains(@id, '_pnlTitulo')]
+
         title = tree.xpath("//span[contains(@id, 'ucLinkDocumento_lblDocumentoTitulo')]")
         if(len(title) == 0):
             logger.error("non existent")

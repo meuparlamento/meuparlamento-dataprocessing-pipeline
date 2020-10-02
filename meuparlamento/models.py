@@ -23,11 +23,11 @@ class ProposalDAO(object):
 
     def insert_proposal(self, doc):
         #check if has votes
-        # if("resultadoFinal" in doc.keys()):
-        try:
-            self.db["proposals"].insert_one(doc)
-        except:
-            logger.error("Failed to persist proposal")
+        if("resultadoFinal" in doc.keys()):
+            try:
+                self.db["proposals"].insert_one(doc)
+            except:
+                logger.error("Failed to persist proposal")
 
 from datetime import datetime
 

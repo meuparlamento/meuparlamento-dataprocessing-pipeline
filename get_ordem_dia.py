@@ -56,19 +56,23 @@ if ag_day:
             if("BID" in _url):
                 _bid = _url.split("BID=")[1]
             
+            # print(_url)
             propostas.append({"title":_title, "url":_url, "bid":_bid})        
 
 
 # Request proposals details using Luigi task
 import os 
 os.system("./set_env.sh")
-from run_luigi import SimplifyDocumentSchema
+from run_luigi import SimplifyDocumentSchema, ProposalDatabasePersistence
 from luigi import scheduler, worker
 
 sch = scheduler.Scheduler()
 w = worker.Worker(scheduler=sch)
 
 for proposta in propostas:
-    task = SimplifyDocumentSchema(proposta["bid"])
-    w.add(task)
-    w.run()
+    if(proposta["bid"]):
+        print(proposta)
+        # task = SimplifyDocumentSchema(proposta["bid"])
+        task = ProposalDatabasePersistence(proposta["bid"])
+        w.add(task)
+        w.run()
