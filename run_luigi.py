@@ -21,16 +21,27 @@ from meuparlamento.pdf import PDFReader
 from meuparlamento.nlp import ContentSummarizer
 from meuparlamento.utils import translate_comission_category
 
+import nltk
+
+try:
+    import nltk.data
+    tokenizer = nltk.data.load('nltk:tokenizers/punkt/portuguese.pickle')
+
+except:
+    nltk.download('punkt')
+
 from meuparlamento.pdf_content_processing import extract_pdf_main_content
 
 import os 
-os.system("./set_env.sh")
+import os
+from dotenv import load_dotenv
+
 
 print(os.environ)
 
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
-MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "meuParlamento")
-WORKING_DIR = os.environ.get("WORKING_DIR", "./")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "meuParlamento")
+WORKING_DIR = os.getenv("WORKING_DIR", "./")
 
 print("MONGO_URI", MONGO_URI)
 print("MONGO_DB_NAME", MONGO_DB_NAME)

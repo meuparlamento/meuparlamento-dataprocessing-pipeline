@@ -5,6 +5,11 @@ from lxml import etree
 
 import re
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 url = "http://app.parlamento.pt/BI2/"
 
 """
@@ -62,7 +67,6 @@ if ag_day:
 
 # Request proposals details using Luigi task
 import os 
-os.system("./set_env.sh")
 from run_luigi import SimplifyDocumentSchema, ProposalDatabasePersistence
 from luigi import scheduler, worker
 
